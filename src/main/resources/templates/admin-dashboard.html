@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>แดชบอร์ดผู้บริหาร - หมอพรออนไลน์</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .header { background-color: #1a1a1a; color: white; padding: 20px; text-align: center; border-bottom: 5px solid #00563B; }
+        .container { padding: 30px; max-width: 1200px; margin: auto; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .stat-box h3 { margin: 0; color: #666; font-size: 1.05em; }
+        .stat-box .number { font-size: 2.8em; font-weight: bold; margin-top: 10px; }
+        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; max-width: 500px; margin: auto; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- แก้บั๊ก UI: ใช้ Flexbox จัดการปุ่มออกจากระบบไม่ให้ทับกับข้อความหลัก -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; padding-bottom: 10px;">
+            <span style="font-weight: bold; margin-right: 15px;">📊 ผู้บริหาร / ผู้อำนวยการ</span>
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" style="background: none; border: 1px solid white; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">ออกจากระบบ</button>
+            </form>
+        </div>
+        <h1 style="margin:0;">📊 ศูนย์ควบคุมข้อมูล หมอพรออนไลน์</h1>
+        <p style="margin:5px 0 0 0; color:#aaa;">(Executive Analytics Dashboard)</p>
+    </div>
+    
+    <div class="container">
+        <!-- แก้บั๊ก UI: เพิ่มกล่องสีเขียวและสีขาวให้ครบถ้วน -->
+        <div class="stat-grid">
+            <div class="stat-box" style="border-bottom: 5px solid #00563B;">
+                <h3>จำนวนผู้ป่วยรวม</h3>
+                <div class="number" style="color: #00563B;" th:text="${stats.totalQueues}">0</div>
+            </div>
+            <div class="stat-box" style="border-bottom: 5px solid #dc3545;">
+                <h3>วิกฤต (แดง)</h3>
+                <div class="number" style="color: #dc3545;" th:text="${stats.redCount}">0</div>
+            </div>
+            <div class="stat-box" style="border-bottom: 5px solid #ffc107;">
+                <h3>เร่งด่วน (เหลือง)</h3>
+                <div class="number" style="color: #ffc107;" th:text="${stats.yellowCount}">0</div>
+            </div>
+            <div class="stat-box" style="border-bottom: 5px solid #28a745;">
+                <h3>รอได้ (เขียว)</h3>
+                <div class="number" style="color: #28a745;" th:text="${stats.greenCount}">0</div>
+            </div>
+            <div class="stat-box" style="border-bottom: 5px solid #ced4da;">
+                <h3>ทั่วไป (ขาว)</h3>
+                <div class="number" style="color: #6c757d;" th:text="${stats.whiteCount}">0</div>
+            </div>
+        </div>
+
+        <!-- กราฟวงกลม -->
+        <div class="chart-container">
+            <h3 style="text-align: center; color: #00563B;">สัดส่วนความฉุกเฉินผู้ป่วย (Triage Breakdown)</h3>
+            <div style="position: relative; height: 300px; width: 100%; margin-top: 20px;">
+                <canvas id="triageChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- สคริปต์วาดกราฟ -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var red = /*[[${stats.redCount}]]*/ 0;
+        var yellow = /*[[${stats.yellowCount}]]*/ 0;
+        var green = /*[[${stats.greenCount}]]*/ 0;
+        var white = /*[[${stats.whiteCount}]]*/ 0;
+
+        var ctx = document.getElementById('triageChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['สีแดง (วิกฤต)', 'สีเหลือง (เร่งด่วน)', 'สีเขียว (รอได้)', 'สีขาว (ทั่วไป)'],
+                datasets: [{
+                    data: [red, yellow, green, white],
+                    backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#f8f9fa'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

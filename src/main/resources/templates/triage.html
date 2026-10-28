@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ซักประวัติและคัดกรอง - หมอพรออนไลน์</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .header { background-color: #00563B; color: #FFD700; padding: 20px; text-align: center; border-bottom: 5px solid #FFD700; }
+        .container { padding: 30px; max-width: 600px; margin: auto; background: white; margin-top: 40px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .patient-info { background-color: #eaf1ed; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 5px solid #00563B; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #00563B; font-weight: bold; }
+        input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background-color: #00563B; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px;}
+        .btn-submit:hover { background-color: #00422c; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🩺 บันทึกสัญญาณชีพและคัดกรอง</h2>
+    </div>
+    
+    <div class="container">
+        <!-- แสดงข้อมูลคนไข้ให้พยาบาลดูเพื่อความชัวร์ว่าเรียกถูกคน -->
+        <div class="patient-info">
+            <h3 style="margin-top:0; color:#00563B;" th:text="'คิว: ' + ${queue.queueNumber}">คิว: Q-xxx</h3>
+            <p th:text="'ชื่อคนไข้: ' + ${queue.patient.firstName} + ' ' + ${queue.patient.lastName}">ชื่อ: xxx</p>
+        </div>
+
+        <form th:action="@{/triage/{id}(id=${queue.id})}" th:object="${triage}" method="post">
+            <div class="form-group">
+                <label>ความดันโลหิต (mmHg):</label>
+                <input type="text" th:field="*{bloodPressure}" placeholder="เช่น 120/80">
+            </div>
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>น้ำหนัก (kg):</label>
+                    <input type="number" step="0.1" th:field="*{weight}">
+                </div>
+                <div style="flex: 1;">
+                    <label>ส่วนสูง (cm):</label>
+                    <input type="number" step="0.1" th:field="*{height}">
+                </div>
+                <div style="flex: 1;">
+                    <label>อุณหภูมิ (°C):</label>
+                    <input type="number" step="0.1" th:field="*{temperature}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>อาการเบื้องต้น:</label>
+                <textarea th:field="*{symptoms}" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>ระดับความฉุกเฉิน (Triage Level):</label>
+                <select th:field="*{triageLevel}">
+                    <option value="WHITE">สีขาว (ทั่วไป/รับยา)</option>
+                    <option value="GREEN">สีเขียว (ไม่รุนแรง รอได้)</option>
+                    <option value="YELLOW">สีเหลือง (เร่งด่วน)</option>
+                    <option value="RED">สีแดง (วิกฤต ฉุกเฉิน)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-submit">บันทึกและส่งเข้าห้องตรวจ</button>
+            <a href="/" style="display: block; text-align: center; margin-top: 15px; color: #666;">ยกเลิก</a>
+        </form>
+    </div>
+</body>
+</html>

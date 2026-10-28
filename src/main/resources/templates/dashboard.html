@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>หมอพรออนไลน์ - แดชบอร์ดจัดการคิว</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            margin: 0; 
+        }
+        .header { 
+            background-color: #00563B; /* สีเขียวเข้ม */
+            color: #FFD700; /* สีทอง */
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 5px solid #FFD700; 
+        }
+        .container { 
+            padding: 30px; 
+            max-width: 1000px; 
+            margin: auto; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background-color: white; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        th { 
+            background-color: #00563B; 
+            color: white; 
+            padding: 15px; 
+            text-align: left; 
+        }
+        td { 
+            padding: 15px; 
+            border-bottom: 1px solid #ddd; 
+        }
+        tr:hover { background-color: #eaf1ed; }
+        .empty-msg { 
+            text-align: center; 
+            padding: 30px; 
+            color: #666; 
+            font-style: italic; 
+        }
+        .btn-call {
+            background-color: #FFD700;
+            color: #00563B;
+            border: none;
+            padding: 8px 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-call:hover { background-color: #e6c200; }
+    </style>
+</head>
+<body>
+	<div class="header">
+	        <div style="display: flex; justify-content: flex-end; align-items: center; padding-bottom: 10px;">
+	            <span style="color: white; font-weight: bold; margin-right: 15px;">👤 พยาบาลจุดคัดกรอง</span>
+	            <form th:action="@{/logout}" method="post" style="margin: 0;">
+	                <button type="submit" style="background: none; border: 1px solid #FFD700; color: #FFD700; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">ออกจากระบบ</button>
+	            </form>
+	        </div>
+	        <h1 style="margin-top: 0;">⚕️ ระบบจัดการคิว หมอพรออนไลน์</h1>
+	        <p style="margin-bottom: 0;">แดชบอร์ดสำหรับพยาบาลจุดคัดกรอง</p>
+	    </div>
+    
+    <div class="container">
+        <h2 style="color: #00563B;">รายการคิวที่รอคัดกรองวันนี้</h2>
+		        <a href="/register" style="display: inline-block; background-color: #FFD700; color: #00563B; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 4px; margin-bottom: 20px;">+ ลงทะเบียนผู้ป่วยใหม่</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>หมายเลขคิว</th>
+                    <th>ชื่อ - นามสกุล</th>
+                    <th>สถานะ</th>
+                    <th>เวลาที่จอง</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- วนลูปแสดงข้อมูลคิวที่ส่งมาจาก Controller -->
+                <tr th:each="queue : ${queues}">
+                    <td th:text="${queue.queueNumber}" style="font-weight: bold; color: #00563B;">A001</td>
+                    <td th:text="${queue.patient.firstName + ' ' + queue.patient.lastName}">ชื่อ นามสกุล</td>
+                    <td th:text="${queue.status}">WAITING_TRIAGE</td>
+                    <td th:text="${queue.createdAt}">เวลา</td>
+					<td>
+					    <a th:href="@{/triage/{id}(id=${queue.id})}" class="btn-call" style="text-decoration: none; display: inline-block;">เรียกคิว</a>
+					</td>
+                </tr>
+                
+                <!-- แสดงข้อความนี้ถ้าหากไม่มีคิวในระบบเลย -->
+                <tr th:if="${#lists.isEmpty(queues)}">
+                    <td colspan="5" class="empty-msg">ขณะนี้ยังไม่มีผู้ป่วยรอคิวในระบบ</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

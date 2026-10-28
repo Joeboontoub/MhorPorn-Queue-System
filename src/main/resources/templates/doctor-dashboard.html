@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>แดชบอร์ดแพทย์ - หมอพรออนไลน์</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .header { background-color: #00563B; color: #FFD700; padding: 20px; text-align: center; border-bottom: 5px solid #FFD700; }
+        .container { padding: 30px; max-width: 1000px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th { background-color: #00563B; color: white; padding: 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #ddd; vertical-align: middle; }
+        tr:hover { background-color: #eaf1ed; }
+        .empty-msg { text-align: center; padding: 30px; color: #666; font-style: italic; }
+        .btn-examine { background-color: #FFD700; color: #00563B; border: none; padding: 8px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-examine:hover { background-color: #e6c200; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { color: #00563B; text-decoration: none; font-weight: bold; }
+        .nav-links a:hover { text-decoration: underline; }
+        
+        /* สไตล์กล่องแจ้งเตือนความสำเร็จ (เพิ่มใหม่) */
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+	<div class="header">
+	        <div style="display: flex; justify-content: flex-end; align-items: center; padding-bottom: 10px;">
+	            <span style="color: white; font-weight: bold; margin-right: 15px;">👨‍⚕️ แพทย์เวร</span>
+	            <form th:action="@{/logout}" method="post" style="margin: 0;">
+	                <button type="submit" style="background: none; border: 1px solid #FFD700; color: #FFD700; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">ออกจากระบบ</button>
+	            </form>
+	        </div>
+	        <h1 style="margin-top: 0;">👨‍⚕️ ห้องตรวจแพทย์ หมอพรออนไลน์</h1>
+	        <p style="margin-bottom: 0;">รายชื่อผู้ป่วยที่รอเข้ารับการตรวจ</p>
+	    </div>
+    
+    <div class="container">
+        <!-- กล่องแสดงข้อความแจ้งเตือน (จะโชว์เมื่อมีข้อความส่งมาเท่านั้น) -->
+        <div th:if="${successMsg}" class="alert-success" th:text="${successMsg}"></div>
+        
+        <h2 style="color: #00563B;">คิวที่รอพบแพทย์ขณะนี้</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>หมายเลขคิว</th>
+                    <th>ชื่อ - นามสกุล</th>
+                    <th>สถานะ</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="queue : ${queues}">
+                    <td th:text="${queue.queueNumber}" style="font-weight: bold; color: #00563B; font-size: 1.1em;">A001</td>
+                    <td th:text="${queue.patient.firstName + ' ' + queue.patient.lastName}">ชื่อ นามสกุล</td>
+                    <td><span style="background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; font-weight: bold;">รอตรวจ</span></td>
+                    
+                    <!-- แก้บั๊ก: ย้ายปุ่มกลับเข้ามาอยู่ใน <td> เรียบร้อยแล้ว -->
+                    <td><a th:href="@{/examine/{id}(id=${queue.id})}" class="btn-examine">เรียกเข้าห้องตรวจ</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(queues)}">
+                    <td colspan="4" class="empty-msg">ขณะนี้ยังไม่มีผู้ป่วยรอตรวจหน้าห้อง</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

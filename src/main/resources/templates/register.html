@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ลงทะเบียนผู้ป่วยใหม่ - หมอพรออนไลน์</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .header { background-color: #00563B; color: #FFD700; padding: 20px; text-align: center; border-bottom: 5px solid #FFD700; }
+        .container { padding: 30px; max-width: 600px; margin: auto; background: white; margin-top: 40px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #00563B; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background-color: #00563B; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+        .btn-submit:hover { background-color: #00422c; }
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; }
+        .btn-back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>📝 ลงทะเบียนผู้ป่วยและรับคิว</h2>
+    </div>
+    
+    <div class="container">
+        <!-- th:action ชี้ไปที่ @PostMapping("/register") ใน Controller -->
+        <form th:action="@{/register}" th:object="${patient}" method="post">
+            
+            <div class="form-group">
+                <label>เลขบัตรประชาชน (13 หลัก):</label>
+                <input type="text" th:field="*{idCardNumber}" required maxlength="13">
+            </div>
+            
+            <div class="form-group">
+                <label>ชื่อจริง:</label>
+                <input type="text" th:field="*{firstName}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>นามสกุล:</label>
+                <input type="text" th:field="*{lastName}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>เบอร์โทรศัพท์:</label>
+                <input type="text" th:field="*{phoneNumber}" maxlength="10">
+            </div>
+            
+            <button type="submit" class="btn-submit">บันทึกข้อมูลและออกคิว</button>
+            <a href="/" class="btn-back">กลับไปหน้าแดชบอร์ด</a>
+            
+        </form>
+    </div>
+</body>
+</html>

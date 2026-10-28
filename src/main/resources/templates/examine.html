@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ห้องตรวจแพทย์ - หมอพรออนไลน์</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .header { background-color: #00563B; color: #FFD700; padding: 20px; text-align: center; border-bottom: 5px solid #FFD700; }
+        .container { padding: 30px; max-width: 800px; margin: auto; background: white; margin-top: 40px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .info-box { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; border-left: 5px solid #00563B;}
+        .info-box h3 { margin-top: 0; color: #00563B; font-size: 1.1em; border-bottom: 1px solid #ddd; padding-bottom: 8px;}
+        .data-row { margin-bottom: 10px; font-size: 1.05em; }
+        .data-label { font-weight: bold; color: #555; }
+        
+        .btn-finish { background-color: #00563B; color: white; border: none; padding: 15px 20px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px;}
+        .btn-finish:hover { background-color: #00422c; }
+        .triage-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-weight: bold; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🩺 ข้อมูลการตรวจรักษาผู้ป่วย</h2>
+    </div>
+    
+    <div class="container">
+        
+        <div class="info-grid">
+            <!-- ข้อมูลผู้ป่วย -->
+            <div class="info-box">
+                <h3>ข้อมูลผู้ป่วย</h3>
+                <div class="data-row"><span class="data-label">หมายเลขคิว:</span> <span th:text="${queue.queueNumber}" style="font-weight:bold; color:#00563B;">Q-xxx</span></div>
+                <div class="data-row"><span class="data-label">ชื่อ-นามสกุล:</span> <span th:text="${queue.patient.firstName + ' ' + queue.patient.lastName}">ชื่อ นามสกุล</span></div>
+                <div class="data-row"><span class="data-label">เลขบัตรประชาชน:</span> <span th:text="${queue.patient.idCardNumber}">1234567890123</span></div>
+                <div class="data-row"><span class="data-label">แพ้ยา:</span> <span th:text="${queue.patient.allergies != null and queue.patient.allergies != '' ? queue.patient.allergies : 'ไม่มีประวัติ'}" style="color:red; font-weight:bold;">-</span></div>
+            </div>
+            
+            <!-- ข้อมูลคัดกรอง -->
+            <div class="info-box">
+                <h3>สัญญาณชีพ (Triage)</h3>
+                <div class="data-row">
+                    <span class="data-label">ระดับความฉุกเฉิน:</span> 
+                    <span th:text="${triage.triageLevel}">GREEN</span>
+                </div>
+                <div class="data-row"><span class="data-label">ความดันโลหิต:</span> <span th:text="${triage.bloodPressure}">120/80</span> mmHg</div>
+                <div class="data-row"><span class="data-label">อุณหภูมิ:</span> <span th:text="${triage.temperature}">36.5</span> °C</div>
+                <div class="data-row"><span class="data-label">น้ำหนัก/ส่วนสูง:</span> <span th:text="${triage.weight} + ' kg / ' + ${triage.height} + ' cm'">-</span></div>
+            </div>
+        </div>
+
+        <div class="info-box" style="grid-column: 1 / -1; margin-bottom: 20px;">
+            <h3>อาการเบื้องต้นที่มาพบแพทย์</h3>
+            <p th:text="${triage.symptoms}" style="font-size: 1.1em; line-height: 1.5; color: #333;">ผู้ป่วยมีอาการ...</p>
+        </div>
+
+        <!-- ปุ่มสำหรับบันทึกการตรวจเสร็จสิ้น -->
+        <form th:action="@{/examine/{id}(id=${queue.id})}" method="post">
+            <button type="submit" class="btn-finish">✔️ ตรวจเสร็จสิ้น / ส่งตัวรับยา</button>
+            <a href="/doctor" style="display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none;">← กลับหน้าแดชบอร์ด (ยังไม่เสร็จสิ้น)</a>
+        </form>
+    </div>
+</body>
+</html>

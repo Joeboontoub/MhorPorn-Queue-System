@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>หน้าจอแสดงคิว - หมอพรออนไลน์</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #FFD700; padding-bottom: 15px; }
+        .header h1 { font-size: 3em; margin: 0; color: #FFD700; }
+        
+		        /* เพิ่ม flex-wrap ให้ปัดบรรทัดอัตโนมัติถ้าจอแคบ */
+		        .container { display: flex; flex-wrap: wrap; gap: 30px; }
+		        
+		        /* เพิ่ม flex: 1 1 300px; เพื่อกำหนดความกว้างขั้นต่ำ */
+		        .column { flex: 1 1 300px; background-color: #1e1e1e; border-radius: 15px; padding: 20px; border-top: 5px solid #00a86b; }
+		        .column.doctor { border-top-color: #FFD700; }
+
+		        /* เพิ่ม Media Query สำหรับจอเล็ก (มือถือ/แท็บเล็ตแนวตั้ง) */
+		        @media (max-width: 768px) {
+		            .header h1 { font-size: 2em; }
+		            .column h2 { font-size: 1.8em; }
+		            .queue-number { font-size: 2em; }
+		            .queue-name { font-size: 1.2em; }
+		            .blink { font-size: 1em; }
+		        }
+        
+        .column h2 { text-align: center; font-size: 2.5em; margin-top: 0; padding-bottom: 15px; border-bottom: 1px solid #333; }
+        .triage-title { color: #00a86b; }
+        .doctor-title { color: #FFD700; }
+        
+        .queue-item { background-color: #2a2a2a; margin-bottom: 15px; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .queue-number { font-size: 3.5em; font-weight: bold; }
+        .queue-name { font-size: 1.8em; color: #aaa; }
+        .blink { animation: blinker 2s linear infinite; color: #FFD700; font-weight: bold; font-size: 1.5em; }
+        @keyframes blinker { 50% { opacity: 0; } }
+        
+        .empty { text-align: center; font-size: 2em; color: #555; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏥 ระบบเรียกคิว หมอพรออนไลน์</h1>
+    </div>
+    
+    <div class="container">
+        <!-- คอลัมน์ซ้าย: คิวรอคัดกรอง -->
+        <div class="column">
+            <h2 class="triage-title">จุดซักประวัติ (รอคัดกรอง)</h2>
+            <div th:each="queue, iterStat : ${triageQueues}" class="queue-item" th:if="${iterStat.index < 5}">
+                <div class="queue-number" th:text="${queue.queueNumber}">Q-001</div>
+                <div class="queue-name" th:text="${queue.patient.firstName}">ชื่อ</div>
+            </div>
+            <div th:if="${#lists.isEmpty(triageQueues)}" class="empty">- ว่าง -</div>
+        </div>
+
+        <!-- คอลัมน์ขวา: คิวรอพบแพทย์ -->
+        <div class="column doctor">
+            <h2 class="doctor-title">จุดตรวจ (รอพบแพทย์)</h2>
+            <div th:each="queue, iterStat : ${doctorQueues}" class="queue-item" th:if="${iterStat.index < 5}">
+                <div class="queue-number" th:text="${queue.queueNumber}" style="color: #FFD700;">Q-001</div>
+                <div class="blink">← เชิญเข้าห้องตรวจ</div>
+            </div>
+            <div th:if="${#lists.isEmpty(doctorQueues)}" class="empty">- ว่าง -</div>
+        </div>
+    </div>
+	<!-- โหลดไลบรารี SockJS และ STOMP สำหรับคุยกับ WebSocket -->
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	    
+	    <script>
+	        // 1. เชื่อมต่อไปที่ท่อ /ws-queue ที่เราสร้างไว้ใน Server
+	        var socket = new SockJS('/ws-queue');
+	        var stompClient = Stomp.over(socket);
+	        
+	        // ซ่อนข้อความ Debug ไม่ให้รก Console
+	        stompClient.debug = null; 
+
+	        // 2. เมื่อเชื่อมต่อสำเร็จ
+	        stompClient.connect({}, function (frame) {
+	            console.log('Connected to WebSocket!');
+	            
+	            // 3. รอฟังเสียงตะโกนจากช่อง /topic/queue-updates
+	            stompClient.subscribe('/topic/queue-updates', function (message) {
+	                if(message.body === "UPDATE") {
+	                    // ถ้ารับสัญญาณ UPDATE ได้ ให้รีเฟรชข้อมูลบนหน้าจอนี้ทันที
+	                    window.location.reload();
+	                }
+	            });
+	        });
+	    </script>
+</body>
+</html>
